@@ -1,3 +1,4 @@
+# coding=<utf-8>
 '''
 Created on 8 Jan 2015
 
@@ -7,6 +8,7 @@ import xlrd, os, sys
 import datetime
 import re
 import helper
+import ner_nltk
 
 TIMESTAMP_COL = "Translation_Timestamp" #"Translation_Timestamp"
 PAGE_COL = "Page"
@@ -29,13 +31,15 @@ class Bunch(object):
             raise AttributeError("No attribute '%s' found" % key)
         
 class TxtCorpus(object):     
-    def __init__(self, folder_path):
+    def __init__(self, folder_path, data_file=None):
         self.corpus = folder_path
+        self.data_file = data_file
         
     def __iter__(self):
         files = os.listdir(self.corpus)
         for file_item in files:
-            with open(file_item, 'r') as f:
+            file_path = self.corpus + os.sep + file_item
+            with open(file_path, 'r') as f:
                 yield f.read()
     
     def each(self, fun):
@@ -129,21 +133,47 @@ def replaceA(strg):
     return expr.sub("", strg)
 
 if __name__ == "__main__":
-    file_path = 'C:'+os.sep+'TestTexts'+os.sep+'TestData'+os.sep+'1916letters_all_translations22092014.xlsx'
-    corpus_path = 'C:'+os.sep+'TestTexts'+os.sep+'1916letters_all_translations22092014'
+    data_dir = 'C:'+os.sep+'TestTexts'
+    pickle_name = data_dir + os.sep + "stopword.pickle"
+    """
     if os.path.isfile(file_path):
         l = get_data_from_Excel(file_path)  
         latest = find_latest_entries(l)
         list_to_folder(latest, corpus_path)
         
         c = TxtCorpus(corpus_path)
+        print "Corpus created"
+        #c.each(replaceA)
+        count = 0
         
-        c.each(replaceA)
         
+        
+        helper.item_to_pickle(pickle_name, set())
+        for txt in c:  
+            count += 1  
+            if count%100==0:
+                print count
+            stopw_set = helper.item_from_pickle(pickle_name) 
+            helper.item_to_pickle(pickle_name, stopw_set | ner_nltk.build_ner_stopwordlst(txt))
+            
+        print "Finished creating stopword pickle"
+        with open(data_dir + os.sep + "stopwordlist.txt", "w") as f:
+            stopw_set = helper.item_from_pickle(pickle_name) 
+            f.write("\n".join(stopw_set))
+            
+                        
         print len(l)
         print len(latest)
+        
     else:
         print 'Filepath not correct: ' + file_path
+    """
     
+    stopw_set = helper.item_from_pickle(pickle_name)
+    
+    with open(data_dir + os.sep + "letters_stopwords.txt", "w+") as f: 
+            f.write(" ".join(stopw_set))
+    
+    print("Done!")
     
     

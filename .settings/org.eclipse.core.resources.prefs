@@ -1,2 +1,5 @@
 eclipse.preferences.version=1
 encoding//src/helper.py=utf-8
+encoding//src/import_excel.py=utf-8
+encoding//src/ner_nltk.py=utf-8
+encoding//src/txt_classes.py=utf-8

@@ -59,7 +59,9 @@ def get_text_files(filedir, ext):
             files.append(file)         
     return files    
 
-
+def txt_from_file(file_path):
+    with open(file_path, "r") as f:
+        return f.read()
             
 def replace_strg(strg, lst):
     """
